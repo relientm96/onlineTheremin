@@ -7,5 +7,4 @@
 Link to application:
 https://relientm96.github.io/onlineTheremin/
 
-Demo:
 ![Demo](demo.gif)
