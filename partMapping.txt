@@ -1,0 +1,20 @@
+// Reference Text File for PoseNet Outputs
+
+position: {x: 365.6761392081294, y: 283.394364531402}
+score: 0.9998120069503784
+1: {score: 0.9999264478683472, part: "leftEye", position: {…}}
+2: {score: 0.999019980430603, part: "rightEye", position: {…}}
+3: {score: 0.9982990622520447, part: "leftEar", position: {…}}
+4: {score: 0.23548899590969086, part: "rightEar", position: {…}}
+5: {score: 0.9929505586624146, part: "leftShoulder", position: {…}}
+6: {score: 0.9951410293579102, part: "rightShoulder", position: {…}}
+7: {score: 0.1461249738931656, part: "leftElbow", position: {…}}
+8: {score: 0.9761096239089966, part: "rightElbow", position: {…}}
+9: {score: 0.014653702266514301, part: "leftWrist", position: {…}}
+10: {score: 0.5008467435836792, part: "rightWrist", position: {…}}
+11: {score: 0.032695021480321884, part: "leftHip", position: {…}}
+12: {score: 0.15065138041973114, part: "rightHip", position: {…}}
+13: {score: 0.001976520288735628, part: "leftKnee", position: {…}}
+14: {score: 0.018263116478919983, part: "rightKnee", position: {…}}
+15: {score: 0.0009664461831562221, part: "leftAnkle", position: {…}}
+16: {score: 0.0051261610351502895, part: "rightAnkle", position: {…}}
