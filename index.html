@@ -32,18 +32,15 @@
             </div>
             <div class="col s12 m12 l6">
                 <h4> Control Parameters </h4>
-                <p>
-                    Press Play Audio to Start
-                </p>
                 <a class="waves-effect waves-light btn" id="button">Play Audio</a>
                 <a class="waves-effect waves-light btn red" id="stopBtn" onclick="stopMusic()">Stop Audio</a>
+                <h3> Status </h3>
+                <h5 id="status">Press Play Audio to Start!</h5>
                 <p>
-                    Move your nose left to right to change note.
+                    Note:
+                    <br>Move your left wrist to up and down to change current note.
+                    <br> Move your right wrist up to down to change current note octave.
                 </p>
-                <p>
-                    Move your right wrist up to down to change current note octave.
-                </p>
-                <h4 id="status">Press Play Audio to Start!</h4>
             </div>
         </div>
         <p id="info"></p>
@@ -143,7 +140,7 @@
 
                     // Control sound from right hand
                     if (results[0].keypoints[9]['score'] && results[0].keypoints[10]['score'] > minDisplayThresh) {
-                        if (results[0].keypoints[9].position['y'] > 400) {
+                        if (results[0].keypoints[9].position['y'] > 350) {
                             if (results[0].keypoints[10].position['y'] > 350) {
                                 synth.setNote('C2');
                                 document.getElementById('status').textContent = "Playing Note C2";
@@ -155,45 +152,7 @@
                                 document.getElementById('status').textContent = "Playing Note C4";
                             }
 
-                        } else if (results[0].keypoints[9].position['y'] > 350) {
-                            if (results[0].keypoints[10].position['y'] > 350) {
-                                synth.setNote('G2');
-                                document.getElementById('status').textContent = "Playing Note G2";
-                            } else if (results[0].keypoints[10].position['y'] > 175) {
-                                synth.setNote('G3');
-                                document.getElementById('status').textContent = "Playing Note G3";
-                            } else {
-                                synth.setNote('G4');
-                                document.getElementById('status').textContent = "Playing Note G4";
-                            }
-
-                        } else if (results[0].keypoints[9].position['y'] > 250) {
-                            if (results[0].keypoints[10].position['y'] > 350) {
-                                synth.setNote('F2');
-                                document.getElementById('status').textContent = "Playing Note F2";
-                            } else if (results[0].keypoints[10].position['y'] > 175) {
-                                synth.setNote('F3');
-                                document.getElementById('status').textContent = "Playing Note F3";
-                            } else {
-                                synth.setNote('F4');
-                                document.getElementById('status').textContent = "Playing Note F4";
-                            }
-
-                        } else if (results[0].keypoints[9].position['y'] > 150) {
-                            if (results[0].keypoints[10].position['y'] > 350) {
-                                synth.setNote('E2');
-                                document.getElementById('status').textContent = "Playing Note E2";
-
-                            } else if (results[0].keypoints[10].position['y'] > 175) {
-                                synth.setNote('E3');
-                                document.getElementById('status').textContent = "Playing Note E3";
-
-                            } else {
-                                synth.setNote('E4');
-                                document.getElementById('status').textContent = "Playing Note E4";
-                            }
-
-                        } else if (results[0].keypoints[9].position['y'] > 80) {
+                        } else if (results[0].keypoints[9].position['y'] > 300) {
                             if (results[0].keypoints[10].position['y'] > 350) {
                                 synth.setNote('D2');
                                 document.getElementById('status').textContent = "Playing Note D2";
@@ -203,6 +162,44 @@
                             } else {
                                 synth.setNote('D4');
                                 document.getElementById('status').textContent = "Playing Note D4";
+                            }
+
+                        } else if (results[0].keypoints[9].position['y'] > 250) {
+                            if (results[0].keypoints[10].position['y'] > 350) {
+                                synth.setNote('E2');
+                                document.getElementById('status').textContent = "Playing Note E2";
+                            } else if (results[0].keypoints[10].position['y'] > 175) {
+                                synth.setNote('E3');
+                                document.getElementById('status').textContent = "Playing Note E3";
+                            } else {
+                                synth.setNote('E4');
+                                document.getElementById('status').textContent = "Playing Note E4";
+                            }
+
+                        } else if (results[0].keypoints[9].position['y'] > 150) {
+                            if (results[0].keypoints[10].position['y'] > 350) {
+                                synth.setNote('F2');
+                                document.getElementById('status').textContent = "Playing Note F2";
+
+                            } else if (results[0].keypoints[10].position['y'] > 175) {
+                                synth.setNote('F3');
+                                document.getElementById('status').textContent = "Playing Note F3";
+
+                            } else {
+                                synth.setNote('F4');
+                                document.getElementById('status').textContent = "Playing Note F4";
+                            }
+
+                        } else if (results[0].keypoints[9].position['y'] > 80) {
+                            if (results[0].keypoints[10].position['y'] > 350) {
+                                synth.setNote('G2');
+                                document.getElementById('status').textContent = "Playing Note G2";
+                            } else if (results[0].keypoints[10].position['y'] > 175) {
+                                synth.setNote('G3');
+                                document.getElementById('status').textContent = "Playing Note G3";
+                            } else {
+                                synth.setNote('G4');
+                                document.getElementById('status').textContent = "Playing Note G4";
                             }
                         } else {
                             if (results[0].keypoints[10].position['y'] > 350) {
