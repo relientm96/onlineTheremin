@@ -20,55 +20,15 @@
     <!--Let browser know website is optimized for mobile-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <style>
-        /* Flipping Camera Mirror Image */
-        
-        #output {
-            -moz-transform: scaleX(-1) scaleY(1);
-            -o-transform: scaleX(-1) scaleY(1);
-            -webkit-transform: scaleX(-1) scaleY(1);
-            transform: scaleX(-1) scaleY(1);
-        }
-        
-        .loader {
-            position: relative;
-            left: 36%;
-            border: 16px solid #f3f3f3;
-            border-radius: 50%;
-            border-top: 16px solid #3498db;
-            width: 120px;
-            height: 120px;
-            -webkit-animation: spin 2s linear infinite;
-            /* Safari */
-            animation: spin 2s linear infinite;
-        }
-        /* Safari */
-        
-        @-webkit-keyframes spin {
-            0% {
-                -webkit-transform: rotate(0deg);
-            }
-            100% {
-                -webkit-transform: rotate(360deg);
-            }
-        }
-        
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-    </style>
+    <!-- Linking to CSS File -->
+    <link rel="stylesheet" href="index.css">
 </head>
 
 <body>
     <video autoplay="true" id="videoElement" style="display: none;"></video>
     <div style="text-align: center;">
         <h3>Online Human Theremin</h3>
-        <p>Matthew Yong - 2019</p>
+        <p>By Matthew Yong - 2020</p>
         <div class="row">
             <div class="col s12 m12 l6" id="outputID">
                 <div class="container">
@@ -82,233 +42,31 @@
                 <h4> Control Parameters </h4>
                 <a class="waves-effect waves-light btn" id="button">Play Audio</a>
                 <a class="waves-effect waves-light btn red" id="stopBtn" onclick="stopMusic()">Stop Audio</a>
-                <h3> Status </h3>
+
                 <h5 id="status">Press Play Audio to Start!</h5>
-                <p>
-                    Note:
-                    <br>Move your left wrist up and down to change current <b>note</b>.
-                    <br> Move your right wrist up and down to change current note <b>octave</b>.
-                </p>
+                <div class="slidecontainer">
+                    <div style="display: inline-flex">
+                        <p style="margin-right: 10;"> Minimum Score Threshold:</p>
+                        <p id="sliderVal"></p>
+                    </div>
+                    <input type="range" min="0" max="1" value="0.5" class="slider" step="0.01" id="myRange">
+                </div>
+                <div style="text-align: left;">
+                    <p>
+                        Note:
+                        <br> - Move your left wrist <b>(green)</b> up and down to change current <b>note</b>.
+                        <br> - Move your right wrist <b>(blue)</b> up and down to change current note <b>octave</b>.
+                        <br> - <b>Red</b> Keypoints are other keypoints detected on your body (such as nose, eyes ...).
+                        <br> - Minimum Threshold Score determines minimum score value to consider it as a keypoint.
+                        <br> --> Higher means higher accuracy but less tolerance for keypoint detection.
+                        <br> --> Lower means lower accuracy but higher tolerance for keypoint detection.
+                    </p>
+                </div>
             </div>
         </div>
     </div>
+    <!-- Linking to Main Javascript File -->
+    <script src="index.js"></script>
 </body>
-
-<script>
-    /*---------------------------------Audio Synthesis Program ---------------------------------*/
-
-    var synth = new Tone.Synth().toMaster()
-
-    //attach a click listener to a play button
-    document.getElementById('button').addEventListener('click', async() => {
-        await Tone.start();
-        console.log('audio is ready');
-        playAudio();
-    });
-
-    function playAudio() {
-        //play a middle 'C' for the duration of an 8th note
-        synth.triggerAttack('C4');
-        status.textContent = "Audio Started";
-    }
-
-    function stopMusic() {
-        synth.triggerRelease();
-        let status = document.getElementById('status');
-        status.textContent = "Audio Stopped";
-    }
-
-    function noteDisplay(value) {
-        var outputString = "Playing Note ";
-        var statusNew = outputString.concat(value);
-        console.log(statusNew);
-        document.getElementById('status').textContent = statusNew;
-    }
-
-    /*---------------------------------Pose Detection Program ---------------------------------*/
-
-    /**
-     * CAMERA Functions
-     * Referenced from posenet's github camera demo
-     */
-
-    var videoWidth = 500;
-    var videoHeight = 400;
-
-    // Mobile Support
-    const mobile = /Android/i.test(navigator.userAgent) || /iPhone|iPad|iPod/i.test(navigator.userAgent);
-    // Asynchronous function to set camera configurations
-    async function setupCamera() {
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            throw new Error(
-                'Browser API navigator.mediaDevices.getUserMedia not available');
-        }
-        const video = document.getElementById('videoElement');
-        video.width = videoWidth;
-        video.height = videoHeight;
-        const stream = await navigator.mediaDevices.getUserMedia({
-            'audio': false,
-            'video': {
-                facingMode: 'user',
-                width: mobile ? undefined : videoWidth,
-                height: mobile ? undefined : videoHeight,
-            },
-        });
-        video.srcObject = stream;
-        return new Promise((resolve) => {
-            video.onloadedmetadata = () => {
-                resolve(video);
-            };
-        });
-    }
-
-    // Async function to load camera permissions and settings
-    // Referenced from posenet's camera.js demo code
-    async function loadVideo() {
-        const video = await setupCamera();
-        video.play();
-        return video;
-    }
-
-    // Detects poses in real time with a WebCam Stream
-    // Referenced from posenet's camera.js demo code
-    function detectPoseInRealTime(video, net) {
-        minDisplayThresh = 0.4;
-        const canvas = document.getElementById('output');
-        const ctx = canvas.getContext('2d');
-        canvas.width = videoWidth;
-        canvas.height = videoHeight;
-        async function getPose() {
-            let poses = [];
-            const pose = net.estimatePoses(video, {
-                    flipHorizontal: false,
-                    maxDetections: 2,
-                    scoreThreshold: 0.6,
-                    nmsRadius: 20
-                }).then(function(results) {
-
-                    // Control sound from right hand
-                    if (results[0].keypoints[9]['score'] && results[0].keypoints[10]['score'] > minDisplayThresh) {
-                        if (results[0].keypoints[9].position['y'] > 350) {
-                            if (results[0].keypoints[10].position['y'] > 350) {
-                                synth.setNote('C2');
-                                document.getElementById('status').textContent = "Playing Note C2";
-                            } else if (results[0].keypoints[10].position['y'] > 175) {
-                                synth.setNote('C3');
-                                document.getElementById('status').textContent = "Playing Note C3";
-                            } else {
-                                synth.setNote('C4');
-                                document.getElementById('status').textContent = "Playing Note C4";
-                            }
-
-                        } else if (results[0].keypoints[9].position['y'] > 300) {
-                            if (results[0].keypoints[10].position['y'] > 350) {
-                                synth.setNote('D2');
-                                document.getElementById('status').textContent = "Playing Note D2";
-                            } else if (results[0].keypoints[10].position['y'] > 175) {
-                                synth.setNote('D3');
-                                document.getElementById('status').textContent = "Playing Note D3";
-                            } else {
-                                synth.setNote('D4');
-                                document.getElementById('status').textContent = "Playing Note D4";
-                            }
-
-                        } else if (results[0].keypoints[9].position['y'] > 250) {
-                            if (results[0].keypoints[10].position['y'] > 350) {
-                                synth.setNote('E2');
-                                document.getElementById('status').textContent = "Playing Note E2";
-                            } else if (results[0].keypoints[10].position['y'] > 175) {
-                                synth.setNote('E3');
-                                document.getElementById('status').textContent = "Playing Note E3";
-                            } else {
-                                synth.setNote('E4');
-                                document.getElementById('status').textContent = "Playing Note E4";
-                            }
-
-                        } else if (results[0].keypoints[9].position['y'] > 150) {
-                            if (results[0].keypoints[10].position['y'] > 350) {
-                                synth.setNote('F2');
-                                document.getElementById('status').textContent = "Playing Note F2";
-
-                            } else if (results[0].keypoints[10].position['y'] > 175) {
-                                synth.setNote('F3');
-                                document.getElementById('status').textContent = "Playing Note F3";
-
-                            } else {
-                                synth.setNote('F4');
-                                document.getElementById('status').textContent = "Playing Note F4";
-                            }
-
-                        } else if (results[0].keypoints[9].position['y'] > 80) {
-                            if (results[0].keypoints[10].position['y'] > 350) {
-                                synth.setNote('G2');
-                                document.getElementById('status').textContent = "Playing Note G2";
-                            } else if (results[0].keypoints[10].position['y'] > 175) {
-                                synth.setNote('G3');
-                                document.getElementById('status').textContent = "Playing Note G3";
-                            } else {
-                                synth.setNote('G4');
-                                document.getElementById('status').textContent = "Playing Note G4";
-                            }
-                        } else {
-                            if (results[0].keypoints[10].position['y'] > 350) {
-                                synth.setNote('A2');
-                                document.getElementById('status').textContent = "Playing Note A2";
-                            } else if (results[0].keypoints[10].position['y'] > 175) {
-                                synth.setNote('A3');
-                                document.getElementById('status').textContent = "Playing Note A3";
-                            } else {
-                                synth.setNote('A4');
-                                document.getElementById('status').textContent = "Playing Note A4";
-                            }
-                        }
-                    } else {
-                        let status = document.getElementById('status');
-                        status.textContent = "I can't see your hands please keep them in frame!";
-                    }
-
-                    // Redraw Key Points
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    ctx.save();
-                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                    ctx.restore();
-                    ctx.fillStyle = "#FF0000";
-                    for (i = 0; i < results[0].keypoints.length; i++) {
-                        // Only redraw them if score higher than threshold score
-                        if (results[0].keypoints[i]['score'] > minDisplayThresh) {
-                            x = results[0].keypoints[i].position['x'];
-                            y = results[0].keypoints[i].position['y'];
-                            ctx.fillRect(x, y, 10, 10);
-                        }
-                    }
-                })
-                // Looping event
-            window.requestAnimationFrame(getPose);
-        }
-        getPose();
-    }
-
-    //  Function to run entire thing
-    async function run() {
-        const net = await posenet.load();
-        let video;
-        try {
-            video = await loadVideo();
-            document.getElementById('camSetup').textContent = "";
-            document.getElementById('loaderID').remove();
-        } catch (e) {
-            document.getElementById('camSetup').textContent =
-                'this browser does not support video capture,' +
-                'or this device does not have a camera';
-            throw e;
-        }
-        detectPoseInRealTime(video, net);
-    }
-
-    navigator.getUserMedia = navigator.getUserMedia ||
-        navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-    // Start program
-    run();
-</script>
 
 </html>
