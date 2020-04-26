@@ -75,7 +75,7 @@
                     <h5 id="camSetup">Setting Up Camera</h5>
                     <div class="loader" id='loaderID'></div>
                 </div>
-                <canvas id="output">
+                <canvas id="output" style="width: 500px; height: 400px">
                 </canvas>
             </div>
             <div class="col s12 m12 l6">
@@ -86,7 +86,7 @@
                 <h5 id="status">Press Play Audio to Start!</h5>
                 <p>
                     Note:
-                    <br>Move your left wrist up and down to change current <b> note </b>.
+                    <br>Move your left wrist up and down to change current <b>note</b>.
                     <br> Move your right wrist up and down to change current note <b>octave</b>.
                 </p>
             </div>
@@ -132,23 +132,11 @@
      * Referenced from posenet's github camera demo
      */
 
-    const videoWidth = 600;
-    const videoHeight = 500;
+    var videoWidth = 500;
+    var videoHeight = 400;
 
     // Mobile Support
-    function isAndroid() {
-        return /Android/i.test(navigator.userAgent);
-    }
-
-    function isiOS() {
-        return /iPhone|iPad|iPod/i.test(navigator.userAgent);
-    }
-
-    function isMobile() {
-        return isAndroid() || isiOS();
-    }
-
-    const mobile = isMobile();
+    const mobile = /Android/i.test(navigator.userAgent) || /iPhone|iPad|iPod/i.test(navigator.userAgent);
     // Asynchronous function to set camera configurations
     async function setupCamera() {
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
