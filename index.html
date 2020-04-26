@@ -19,6 +19,49 @@
 
     <!--Let browser know website is optimized for mobile-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <style>
+        /* Flipping Camera Mirror Image */
+        
+        #output {
+            -moz-transform: scaleX(-1) scaleY(1);
+            -o-transform: scaleX(-1) scaleY(1);
+            -webkit-transform: scaleX(-1) scaleY(1);
+            transform: scaleX(-1) scaleY(1);
+        }
+        
+        .loader {
+            position: relative;
+            left: 36%;
+            border: 16px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 16px solid #3498db;
+            width: 120px;
+            height: 120px;
+            -webkit-animation: spin 2s linear infinite;
+            /* Safari */
+            animation: spin 2s linear infinite;
+        }
+        /* Safari */
+        
+        @-webkit-keyframes spin {
+            0% {
+                -webkit-transform: rotate(0deg);
+            }
+            100% {
+                -webkit-transform: rotate(360deg);
+            }
+        }
+        
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -28,10 +71,11 @@
         <p>Matthew Yong - 2019</p>
         <div class="row">
             <div class="col s12 m12 l6" id="outputID">
-                <canvas id="output" style="-moz-transform: scaleX(-1) scaleY(1);
-                -o-transform: scaleX(-1) scaleY(1);
-                -webkit-transform: scaleX(-1) scaleY(1);
-                transform: scaleX(-1) scaleY(1);">
+                <div class="container">
+                    <h5 id="camSetup">Setting Up Camera</h5>
+                    <div class="loader" id='loaderID'></div>
+                </div>
+                <canvas id="output">
                 </canvas>
             </div>
             <div class="col s12 m12 l6">
@@ -42,12 +86,11 @@
                 <h5 id="status">Press Play Audio to Start!</h5>
                 <p>
                     Note:
-                    <br>Move your left wrist to up and down to change current note.
-                    <br> Move your right wrist up to down to change current note octave.
+                    <br>Move your left wrist up and down to change current <b> note </b>.
+                    <br> Move your right wrist up and down to change current note <b>octave</b>.
                 </p>
             </div>
         </div>
-        <p id="info"></p>
     </div>
 </body>
 
@@ -263,11 +306,11 @@
         let video;
         try {
             video = await loadVideo();
-            let info = document.getElementById('info');
-            info.textContent = '';
+            document.getElementById('camSetup').textContent = "";
+            document.getElementById('loaderID').remove();
         } catch (e) {
-            let info = document.getElementById('info');
-            info.textContent = 'this browser does not support video capture,' +
+            document.getElementById('camSetup').textContent =
+                'this browser does not support video capture,' +
                 'or this device does not have a camera';
             throw e;
         }
