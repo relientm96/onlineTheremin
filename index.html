@@ -92,6 +92,20 @@
     const videoWidth = 600;
     const videoHeight = 500;
 
+    // Mobile Support
+    function isAndroid() {
+        return /Android/i.test(navigator.userAgent);
+    }
+
+    function isiOS() {
+        return /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    }
+
+    function isMobile() {
+        return isAndroid() || isiOS();
+    }
+
+    const mobile = isMobile();
     // Asynchronous function to set camera configurations
     async function setupCamera() {
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -105,8 +119,8 @@
             'audio': false,
             'video': {
                 facingMode: 'user',
-                width: videoWidth,
-                height: videoHeight,
+                width: mobile ? undefined : videoWidth,
+                height: mobile ? undefined : videoHeight,
             },
         });
         video.srcObject = stream;
