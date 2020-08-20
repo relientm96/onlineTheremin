@@ -164,6 +164,45 @@
      }
  }
 
+ 
+function drawLine(sourceX, sourceY, destX, destY){
+    const canvas = document.getElementById('output')
+    let ctx = canvas.getContext('2d');
+    ctx.beginPath();
+    ctx.moveTo(sourceX, sourceY);
+    ctx.lineTo(destX, destY);
+    ctx.strokeStyle = "#FFFFFF";
+    ctx.stroke();
+}
+
+// Function to draw a line between two points
+function drawAllSkeleton(array){
+    const pairs = {
+        0 : 1,
+        1 : 3,
+        2 : 0,
+        4 : 2,
+        5 : 7,
+        6 : 8,
+        7 : 9,
+        8 : 10,
+        12: 6,
+        11: 5
+    }
+    for (i = 0; i < array.length; i++) {
+        // Only redraw them if score higher than threshold score
+        // threshold score here is set by slider by user
+        x = array[i].position['x'];
+        y = array[i].position['y'];
+        if (pairs[i]) {
+            drawLine(x, y, array[pairs[i]].position['x'], array[pairs[i]].position['y'])
+        }
+    }
+    // Complete the skeleton
+    drawLine(array[11].position['x'], array[11].position['y'], array[12].position['x'], array[12].position['y'])
+    drawLine(array[5].position['x'], array[5].position['y'], array[6].position['x'], array[6].position['y'])
+}
+
  // Detects poses in real time with a WebCam Stream
  // Referenced from posenet's camera.js demo code
  function detectPoseInRealTime(video, net) {
@@ -172,11 +211,10 @@
      canvas.width = videoWidth;
      canvas.height = videoHeight;
      async function getPose() {
-         let poses = [];
          const pose = net.estimatePoses(video, {
                  flipHorizontal: false,
                  maxDetections: 2,
-                 scoreThreshold: 0.6,
+                 scoreThreshold: minThresholdScore,
                  nmsRadius: 20
              }).then(function(results) {
                  // Map keypoint results to sound with Tone.js
@@ -187,24 +225,25 @@
                  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
                  ctx.restore();
                  for (i = 0; i < results[0].keypoints.length; i++) {
-                     // Only redraw them if score higher than threshold score
-                     // threshold score here is set by slider by user
-                     if (results[0].keypoints[i]['score'] > minThresholdScore) {
-                         x = results[0].keypoints[i].position['x'];
-                         y = results[0].keypoints[i].position['y'];
-                         if (i == 9) {
-                             // Green for Left Hand
-                             ctx.fillStyle = "#00cc00";
-                         } else if (i == 10) {
-                             // Blue for Right Hand
-                             ctx.fillStyle = "#4da6ff";
-                         } else {
-                             // Red for other keypoints
-                             ctx.fillStyle = "#FF0000";
-                         }
-                         ctx.fillRect(x, y, 10, 10);
-                     }
-                 }
+                    if (results[0].keypoints[i]['score'] > minThresholdScore) {
+                        // Only redraw them if score higher than threshold score
+                        // threshold score here is set by slider by user
+                        x = results[0].keypoints[i].position['x'];
+                        y = results[0].keypoints[i].position['y'];
+                        if (i == 9) {
+                            // Green for Left Hand
+                            ctx.fillStyle = "#00cc00";
+                        } else if (i == 10) {
+                            // Blue for Right Hand
+                            ctx.fillStyle = "#4da6ff";
+                        } else {
+                            // Red for other keypoints
+                            ctx.fillStyle = "#FF0000";
+                        }
+                        ctx.fillRect(x, y, 10, 10);
+                    }
+                }
+                drawAllSkeleton(results[0].keypoints)
              })
              // Looping frame rendering continuosly
          window.requestAnimationFrame(getPose);
